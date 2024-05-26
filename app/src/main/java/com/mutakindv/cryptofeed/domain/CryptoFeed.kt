@@ -1,4 +1,4 @@
-package com.mutakindv.cryptofeed
+package com.mutakindv.cryptofeed.domain
 
 data class CryptoFeed(
     val coinInfo: CoinInfo,

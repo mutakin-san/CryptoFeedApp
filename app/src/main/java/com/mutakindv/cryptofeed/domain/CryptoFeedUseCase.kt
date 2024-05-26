@@ -1,4 +1,4 @@
-package com.mutakindv.cryptofeed
+package com.mutakindv.cryptofeed.domain
 
 import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
