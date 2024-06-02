@@ -1,5 +1,7 @@
 package com.mutakindv.cryptofeed
 
+import com.mutakindv.cryptofeed.api.HttpClient
+import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -37,14 +39,3 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     }
 }
-
-class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
-    fun load() {
-        client.get()
-    }
-}
-
-interface HttpClient{
-    fun get()
-}
-
