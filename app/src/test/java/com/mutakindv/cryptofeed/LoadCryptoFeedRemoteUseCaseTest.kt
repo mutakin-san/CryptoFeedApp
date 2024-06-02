@@ -7,7 +7,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testInitDoesNotLoad() {
         val client = HttpClientSpy()
-        LoadCryptoFeedRemoteUseCase()
+        LoadCryptoFeedRemoteUseCase(client = client)
 
         assert(client.getCount == 0)
     }
@@ -15,8 +15,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testLoadRequestData() {
         val client = HttpClientSpy()
-        HttpClient.instance = client
-        val sut = LoadCryptoFeedRemoteUseCase()
+        val sut = LoadCryptoFeedRemoteUseCase(client = client)
 
         sut.load()
 
@@ -25,26 +24,21 @@ class LoadCryptoFeedRemoteUseCaseTest {
     }
 }
 
-class LoadCryptoFeedRemoteUseCase {
+class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
+
+
     fun load() {
-        HttpClient.instance.get()
+        client.get()
     }
 
 }
 
-open class HttpClient{
-    companion object {
-        var instance = HttpClient()
-    }
-
-
-    open fun get() {
-
-    }
+interface HttpClient{
+    fun get()
 }
 
 
-class HttpClientSpy : HttpClient() {
+class HttpClientSpy : HttpClient {
     var getCount: Int = 0
 
     override fun get() {
