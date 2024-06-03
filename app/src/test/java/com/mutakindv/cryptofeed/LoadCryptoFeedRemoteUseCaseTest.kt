@@ -2,7 +2,10 @@ package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.Connectivity
+import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.HttpClient
+import com.mutakindv.cryptofeed.api.InvalidData
+import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
@@ -64,13 +67,31 @@ class LoadCryptoFeedRemoteUseCaseTest {
         }
     }
     @Test
-    fun testLoadDeliverConnectivityErrorOnClientError() = runBlocking {
+    fun testLoadDeliverConnectivityErrorOnClientError() = runTest {
         every {
             client.get()
-        } returns flowOf(Connectivity())
+        } returns flowOf(ConnectivityException())
 
         sut.load().test{
             assertEquals(Connectivity::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+
+        verify(exactly = 1) {
+            client.get()
+        }
+
+        confirmVerified(client)
+    }
+    @Test
+    fun testLoadDeliverInvalidDataError() = runTest {
+        every {
+            client.get()
+        } returns flowOf(InvalidDataException())
+
+        sut.load().test{
+            assertEquals(InvalidData::class.java, awaitItem()::class.java)
             awaitComplete()
         }
 

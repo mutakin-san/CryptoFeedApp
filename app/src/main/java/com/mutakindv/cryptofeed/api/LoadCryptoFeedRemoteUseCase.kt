@@ -8,21 +8,26 @@ interface HttpClient{
     fun get(): Flow<Exception>
 }
 
+class ConnectivityException : Exception()
+class InvalidDataException : Exception()
+
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
     fun load() : Flow<Exception> = flow {
         client.get().collect { error ->
-            if(error is Connectivity) {
-                emit(Connectivity())
+            when (error) {
+                is ConnectivityException -> {
+                    emit(Connectivity())
+                }
+                is InvalidDataException -> {
+                    emit(InvalidData())
+                }
             }
 
-            if(error is BadResponse) {
-                emit(BadResponse())
-            }
         }
     }
 }
 
 
 class Connectivity : Exception()
-class BadResponse : Exception()
+class InvalidData : Exception()
 
