@@ -1,6 +1,8 @@
 package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
+import com.mutakindv.cryptofeed.api.BadRequest
+import com.mutakindv.cryptofeed.api.BadRequestException
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.HttpClient
@@ -17,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import retrofit2.HttpException
 
 class LoadCryptoFeedRemoteUseCaseTest {
 
@@ -93,7 +96,17 @@ class LoadCryptoFeedRemoteUseCaseTest {
             confirmVerified = client
         )
     }
-
+    @Test
+    fun testLoadDeliverBadRequestError() = runTest {
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClient = BadRequestException(),
+            expectedResult = BadRequest(),
+            exactly = 1,
+            confirmVerified = client
+        )
+    }
 
     private fun expect(
         client: HttpClient,
