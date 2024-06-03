@@ -1,7 +1,6 @@
 package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
-import com.mutakindv.cryptofeed.api.BadResponse
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.HttpClient
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
@@ -10,8 +9,6 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -67,7 +64,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         }
     }
     @Test
-    fun testLoadDeliverErrorOnClientSendConnectivityError() = runBlocking {
+    fun testLoadDeliverConnectivityErrorOnClientError() = runBlocking {
         every {
             client.get()
         } returns flowOf(Connectivity())
