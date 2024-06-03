@@ -13,7 +13,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -35,6 +34,8 @@ class LoadCryptoFeedRemoteUseCaseTest {
         verify(exactly = 0) {
             client.get()
         }
+
+        confirmVerified(client)
     }
 
     @Test
@@ -49,6 +50,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
             client.get()
         }
 
+        confirmVerified(client)
     }
     @Test
     fun testLoadRequestDataTwice() = runTest{
@@ -65,43 +67,55 @@ class LoadCryptoFeedRemoteUseCaseTest {
         verify(exactly = 2) {
             client.get()
         }
+        confirmVerified(client)
     }
+
     @Test
     fun testLoadDeliverConnectivityErrorOnClientError() = runTest {
-        every {
-            client.get()
-        } returns flowOf(ConnectivityException())
-
-        sut.load().test{
-            assertEquals(Connectivity::class.java, awaitItem()::class.java)
-            awaitComplete()
-        }
-
-
-        verify(exactly = 1) {
-            client.get()
-        }
-
-        confirmVerified(client)
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClient = ConnectivityException(),
+            expectedResult = Connectivity(),
+            exactly = 1,
+            confirmVerified = client
+        )
     }
+
     @Test
     fun testLoadDeliverInvalidDataError() = runTest {
-        every {
-            client.get()
-        } returns flowOf(InvalidDataException())
-
-        sut.load().test{
-            assertEquals(InvalidData::class.java, awaitItem()::class.java)
-            awaitComplete()
-        }
-
-
-        verify(exactly = 1) {
-            client.get()
-        }
-
-        confirmVerified(client)
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClient = InvalidDataException(),
+            expectedResult = InvalidData(),
+            exactly = 1,
+            confirmVerified = client
+        )
     }
 
 
+    private fun expect(
+        client: HttpClient,
+        sut: LoadCryptoFeedRemoteUseCase,
+        receivedHttpClient: Exception,
+        expectedResult: Any,
+        exactly: Int = -1,
+        confirmVerified: HttpClient
+    ) = runTest {
+        every {
+            client.get()
+        } returns flowOf(receivedHttpClient)
+
+        sut.load().test {
+            assertEquals(expectedResult::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        verify(exactly = exactly) {
+            client.get()
+        }
+
+        confirmVerified(confirmVerified)
+    }
 }
