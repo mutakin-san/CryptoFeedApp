@@ -1,82 +1,89 @@
 package com.mutakindv.cryptofeed
 
+import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadResponse
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.HttpClient
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
+import io.mockk.MockKAnnotations
+import io.mockk.confirmVerified
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 
 class LoadCryptoFeedRemoteUseCaseTest {
+
+    private val client = mockk<HttpClient>()
+    private lateinit var sut: LoadCryptoFeedRemoteUseCase
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+        sut = LoadCryptoFeedRemoteUseCase(client)
+    }
+
     @Test
     fun testInitDoesNotRequestData() {
-
-        val (_, client) = makeSut()
-
-        assert(client.getCount == 0)
+        verify(exactly = 0) {
+            client.get()
+        }
     }
 
     @Test
-    fun testLoadRequestData() {
-
-        val (sut, client) = makeSut()
-        sut.load()
-
-        assertEquals(1, client.getCount)
+    fun testLoadRequestData() = runTest{
+        every {
+            client.get()
+        } returns flowOf()
+        sut.load().test {
+            awaitComplete()
+        }
+        verify(exactly = 1) {
+            client.get()
+        }
 
     }
     @Test
-    fun testLoadRequestDataTwice() {
+    fun testLoadRequestDataTwice() = runTest{
 
-        val (sut, client) = makeSut()
-        sut.load()
-        sut.load()
-
-        assertEquals(2, client.getCount)
-
+        every {
+            client.get()
+        } returns flowOf()
+        sut.load().test {
+            awaitComplete()
+        }
+        sut.load().test {
+            awaitComplete()
+        }
+        verify(exactly = 2) {
+            client.get()
+        }
     }
     @Test
     fun testLoadDeliverErrorOnClientSendConnectivityError() = runBlocking {
-        val (sut, client) = makeSut()
+        every {
+            client.get()
+        } returns flowOf(Connectivity())
 
-        client.error = Connectivity()
-        var capturedError: Exception? = null
-        sut.load().collect{ error ->
-            capturedError = error
+        sut.load().test{
+            assertEquals(Connectivity::class.java, awaitItem()::class.java)
+            awaitComplete()
         }
 
 
-        assertEquals(Connectivity::class.java, capturedError?.javaClass)
-    }
-    @Test
-    fun testLoadDeliverErrorOnClientSendBadResponseError() = runBlocking {
-        val (sut, client) = makeSut()
-
-        client.error = BadResponse()
-        var capturedError: Exception? = null
-        sut.load().collect{ error ->
-            capturedError = error
+        verify(exactly = 1) {
+            client.get()
         }
 
-        assertEquals(BadResponse::class.java, capturedError?.javaClass)
+        confirmVerified(client)
     }
 
-    private fun makeSut() : Pair<LoadCryptoFeedRemoteUseCase, HttpClientSpy> {
-        val client = HttpClientSpy()
-        val sut = LoadCryptoFeedRemoteUseCase(client = client)
-        return Pair(sut, client)
-    }
 
-    private class HttpClientSpy : HttpClient {
-        var getCount: Int = 0
-        var error: Exception? = null
-        override fun get(): Flow<Exception> = flow {
-            getCount += 1
-            error?.let { emit(it) }
-        }
-
-    }
 }
