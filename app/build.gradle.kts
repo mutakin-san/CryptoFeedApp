@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.retrofit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk.test)
     testImplementation(libs.turbine.test)
