@@ -6,6 +6,8 @@ import com.mutakindv.cryptofeed.api.BadRequestException
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.HttpClient
+import com.mutakindv.cryptofeed.api.InternalServerError
+import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
@@ -103,6 +105,17 @@ class LoadCryptoFeedRemoteUseCaseTest {
             sut = sut,
             receivedHttpClient = BadRequestException(),
             expectedResult = BadRequest(),
+            exactly = 1,
+            confirmVerified = client
+        )
+    }
+    @Test
+    fun testLoadDeliverInternalServerError() = runTest {
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClient = InternalServerErrorException(),
+            expectedResult = InternalServerError(),
             exactly = 1,
             confirmVerified = client
         )

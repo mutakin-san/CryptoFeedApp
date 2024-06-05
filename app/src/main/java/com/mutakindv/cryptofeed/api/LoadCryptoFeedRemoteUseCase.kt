@@ -12,6 +12,7 @@ interface HttpClient{
 class ConnectivityException : Exception()
 class InvalidDataException : Exception()
 class BadRequestException : Exception()
+class InternalServerErrorException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
     fun load() : Flow<Exception> = flow {
@@ -26,6 +27,9 @@ class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
                 is BadRequestException -> {
                     emit(BadRequest())
                 }
+                is InternalServerErrorException -> {
+                    emit(InternalServerError())
+                }
             }
 
         }
@@ -36,4 +40,5 @@ class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
 class Connectivity : Exception()
 class InvalidData : Exception()
 class BadRequest : Exception()
+class InternalServerError : Exception()
 
