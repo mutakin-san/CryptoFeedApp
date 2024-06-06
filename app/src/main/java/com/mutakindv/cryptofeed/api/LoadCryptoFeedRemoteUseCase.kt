@@ -4,9 +4,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 
-
+sealed class HttpClientResult {
+    data class Failure(val exception: Exception) : HttpClientResult()
+}
 interface HttpClient{
-    fun get(): Flow<Exception>
+    fun get(): Flow<HttpClientResult>
 }
 
 class ConnectivityException : Exception()
@@ -16,20 +18,25 @@ class InternalServerErrorException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
     fun load() : Flow<Exception> = flow {
-        client.get().collect { error ->
-            when (error) {
-                is ConnectivityException -> {
-                    emit(Connectivity())
+        client.get().collect { result ->
+            when (result) {
+                is HttpClientResult.Failure -> {
+                    when(result.exception) {
+                        is ConnectivityException -> {
+                            emit(Connectivity())
+                        }
+                        is InvalidDataException -> {
+                            emit(InvalidData())
+                        }
+                        is BadRequestException -> {
+                            emit(BadRequest())
+                        }
+                        is InternalServerErrorException -> {
+                            emit(InternalServerError())
+                        }
+                    }
                 }
-                is InvalidDataException -> {
-                    emit(InvalidData())
-                }
-                is BadRequestException -> {
-                    emit(BadRequest())
-                }
-                is InternalServerErrorException -> {
-                    emit(InternalServerError())
-                }
+
             }
 
         }

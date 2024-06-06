@@ -6,6 +6,7 @@ import com.mutakindv.cryptofeed.api.BadRequestException
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.HttpClient
+import com.mutakindv.cryptofeed.api.HttpClientResult
 import com.mutakindv.cryptofeed.api.InternalServerError
 import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidData
@@ -80,7 +81,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             client = client,
             sut = sut,
-            receivedHttpClient = ConnectivityException(),
+            receivedHttpClient = HttpClientResult.Failure(ConnectivityException()),
             expectedResult = Connectivity(),
             exactly = 1,
             confirmVerified = client
@@ -92,7 +93,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             client = client,
             sut = sut,
-            receivedHttpClient = InvalidDataException(),
+            receivedHttpClient = HttpClientResult.Failure(InvalidDataException()),
             expectedResult = InvalidData(),
             exactly = 1,
             confirmVerified = client
@@ -103,7 +104,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             client = client,
             sut = sut,
-            receivedHttpClient = BadRequestException(),
+            receivedHttpClient = HttpClientResult.Failure(BadRequestException()),
             expectedResult = BadRequest(),
             exactly = 1,
             confirmVerified = client
@@ -114,7 +115,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             client = client,
             sut = sut,
-            receivedHttpClient = InternalServerErrorException(),
+            receivedHttpClient = HttpClientResult.Failure(InternalServerErrorException()),
             expectedResult = InternalServerError(),
             exactly = 1,
             confirmVerified = client
@@ -124,7 +125,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     private fun expect(
         client: HttpClient,
         sut: LoadCryptoFeedRemoteUseCase,
-        receivedHttpClient: Exception,
+        receivedHttpClient: HttpClientResult,
         expectedResult: Any,
         exactly: Int = -1,
         confirmVerified: HttpClient
