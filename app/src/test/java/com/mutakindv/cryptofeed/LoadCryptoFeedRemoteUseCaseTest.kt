@@ -12,6 +12,7 @@ import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
+import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -135,7 +136,14 @@ class LoadCryptoFeedRemoteUseCaseTest {
         } returns flowOf(receivedHttpClient)
 
         sut.load().test {
-            assertEquals(expectedResult::class.java, awaitItem()::class.java)
+            when(val receivedResult = awaitItem()) {
+                is LoadCryptoFeedResult.Success -> {
+
+                }
+                is LoadCryptoFeedResult.Error -> {
+                    assertEquals(expectedResult::class.java, receivedResult.exception::class.java)
+                }
+            }
             awaitComplete()
         }
 

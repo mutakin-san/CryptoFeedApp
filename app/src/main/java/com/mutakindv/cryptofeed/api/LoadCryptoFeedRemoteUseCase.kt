@@ -1,5 +1,6 @@
 package com.mutakindv.cryptofeed.api
 
+import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -17,22 +18,22 @@ class BadRequestException : Exception()
 class InternalServerErrorException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
-    fun load() : Flow<Exception> = flow {
+    fun load() : Flow<LoadCryptoFeedResult> = flow {
         client.get().collect { result ->
             when (result) {
                 is HttpClientResult.Failure -> {
                     when(result.exception) {
                         is ConnectivityException -> {
-                            emit(Connectivity())
+                            emit(LoadCryptoFeedResult.Error(Connectivity()))
                         }
                         is InvalidDataException -> {
-                            emit(InvalidData())
+                            emit(LoadCryptoFeedResult.Error(InvalidData()))
                         }
                         is BadRequestException -> {
-                            emit(BadRequest())
+                            emit(LoadCryptoFeedResult.Error(BadRequest()))
                         }
                         is InternalServerErrorException -> {
-                            emit(InternalServerError())
+                            emit(LoadCryptoFeedResult.Error(InternalServerError()))
                         }
                     }
                 }
