@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.retrofit)
+    implementation(libs.moshi)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk.test)
     testImplementation(libs.turbine.test)

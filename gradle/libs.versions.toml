@@ -12,6 +12,7 @@ coroutines = "1.7.3"
 mockkVersion = "1.13.11"
 turbineVersion = "1.1.0"
 retrofit = "2.11.0"
+moshi = "1.15.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -35,6 +36,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 
 #Networking
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 
 # Mockk Test
 mockk-test = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
