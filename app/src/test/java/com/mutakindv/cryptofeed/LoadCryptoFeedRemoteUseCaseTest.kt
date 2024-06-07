@@ -180,6 +180,22 @@ class LoadCryptoFeedRemoteUseCaseTest {
         )
     }
 
+    @Test
+    fun testLoadDeliverItemsOn200HttpResponseWithEmptyData() = runTest {
+        val remoteCryptoFeedResponse =  emptyList<RemoteCryptoFeedItem>()
+        val cryptoFeedItems = emptyList<CryptoFeed>()
+        expect(
+            sut = sut,
+            receivedHttpClient = HttpClientResult.Success(
+                RemoteCryptoFeed(
+                    remoteCryptoFeedResponse
+                )
+            ),
+            expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
+            exactly = 1,
+        )
+    }
+
     private fun expect(
         sut: LoadCryptoFeedRemoteUseCase,
         receivedHttpClient: HttpClientResult,
@@ -193,7 +209,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         sut.load().test {
             when(val receivedResult = awaitItem()) {
                 is LoadCryptoFeedResult.Success -> {
-                    assertEquals(expectedResult::class.java, receivedResult::class.java)
+                    assertEquals(expectedResult, receivedResult)
                 }
                 is LoadCryptoFeedResult.Error -> {
                     assertEquals(expectedResult::class.java, receivedResult.exception::class.java)
