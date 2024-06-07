@@ -88,46 +88,38 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testLoadDeliverConnectivityErrorOnClientError() = runTest {
         expect(
-            client = client,
             sut = sut,
             receivedHttpClient = HttpClientResult.Failure(ConnectivityException()),
             expectedResult = Connectivity(),
             exactly = 1,
-            confirmVerified = client
         )
     }
 
     @Test
     fun testLoadDeliverInvalidDataError() = runTest {
         expect(
-            client = client,
             sut = sut,
             receivedHttpClient = HttpClientResult.Failure(InvalidDataException()),
             expectedResult = InvalidData(),
             exactly = 1,
-            confirmVerified = client
         )
     }
     @Test
     fun testLoadDeliverBadRequestError() = runTest {
         expect(
-            client = client,
             sut = sut,
             receivedHttpClient = HttpClientResult.Failure(BadRequestException()),
             expectedResult = BadRequest(),
             exactly = 1,
-            confirmVerified = client
         )
     }
     @Test
     fun testLoadDeliverInternalServerError() = runTest {
         expect(
-            client = client,
             sut = sut,
             receivedHttpClient = HttpClientResult.Failure(InternalServerErrorException()),
             expectedResult = InternalServerError(),
             exactly = 1,
-            confirmVerified = client
         )
     }
 
@@ -178,7 +170,6 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testLoadDeliverItemsOn200HttpResponseWithData() = runTest {
         expect(
-            client = client,
             sut = sut,
             receivedHttpClient = HttpClientResult.Success(
                 RemoteCryptoFeed(
@@ -187,17 +178,14 @@ class LoadCryptoFeedRemoteUseCaseTest {
             ),
             expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
             exactly = 1,
-            confirmVerified = client
         )
     }
 
     private fun expect(
-        client: HttpClient,
         sut: LoadCryptoFeedRemoteUseCase,
         receivedHttpClient: HttpClientResult,
         expectedResult: Any,
         exactly: Int = -1,
-        confirmVerified: HttpClient
     ) = runTest {
         every {
             client.get()
@@ -219,6 +207,6 @@ class LoadCryptoFeedRemoteUseCaseTest {
             client.get()
         }
 
-        confirmVerified(confirmVerified)
+        confirmVerified(client)
     }
 }
