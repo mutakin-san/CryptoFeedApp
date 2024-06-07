@@ -13,6 +13,7 @@ class InvalidDataException : Exception()
 class BadRequestException : Exception()
 class NotFoundException : Exception()
 class InternalServerErrorException : Exception()
+class UnexpectedException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
     fun load() : Flow<LoadCryptoFeedResult> = flow {
@@ -38,6 +39,9 @@ class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
                         is InternalServerErrorException -> {
                             emit(LoadCryptoFeedResult.Error(InternalServerError()))
                         }
+                        is UnexpectedException -> {
+                            emit(LoadCryptoFeedResult.Error(Unexpected()))
+                        }
                     }
                 }
 
@@ -62,4 +66,5 @@ class InvalidData : Exception()
 class BadRequest : Exception()
 class NotFound : Exception()
 class InternalServerError : Exception()
+class Unexpected : Exception()
 

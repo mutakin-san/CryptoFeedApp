@@ -19,6 +19,8 @@ import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
 import com.mutakindv.cryptofeed.api.RemoteDisplay
 import com.mutakindv.cryptofeed.api.RemoteUsd
+import com.mutakindv.cryptofeed.api.Unexpected
+import com.mutakindv.cryptofeed.api.UnexpectedException
 import com.mutakindv.cryptofeed.domain.CoinInfo
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
@@ -115,6 +117,16 @@ class LoadCryptoFeedRemoteUseCaseTest {
             exactly = 1,
         )
     }
+    @Test
+    fun testLoadDeliverUnexpectedError() = runTest {
+        expect(
+            sut = sut,
+            receivedHttpClient = HttpClientResult.Failure(UnexpectedException()),
+            expectedResult = Unexpected(),
+            exactly = 1,
+        )
+    }
+
     @Test
     fun testLoadDeliverNotFoundError() = runTest {
         expect(
