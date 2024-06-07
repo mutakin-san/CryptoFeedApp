@@ -5,34 +5,9 @@ import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.Raw
 import com.mutakindv.cryptofeed.domain.Usd
-import com.squareup.moshi.Json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-
-class RemoteCryptoFeed(
-    @Json(name = "Data")
-    val data: List<RemoteCryptoFeedItem>)
-class RemoteCryptoFeedItem(
-    val remoteCoinInfo: RemoteCoinInfo,
-    val remoteRaw: RemoteDisplay
-)
-
-data class RemoteCoinInfo(
-    val id: String,
-    val name: String,
-    val fullName: String,
-    val imageUrl: String,
-)
-
-data class RemoteDisplay(
-    val usd: RemoteUsd
-)
-
-class RemoteUsd(
-    val price: Double,
-    val changePctDay: Float
-)
 sealed class HttpClientResult {
     data class Success(val root: RemoteCryptoFeed) : HttpClientResult()
     data class Failure(val exception: Exception) : HttpClientResult()
