@@ -12,7 +12,16 @@ import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
+import com.mutakindv.cryptofeed.api.RemoteCoinInfo
+import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
+import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
+import com.mutakindv.cryptofeed.api.RemoteDisplay
+import com.mutakindv.cryptofeed.api.RemoteUsd
+import com.mutakindv.cryptofeed.domain.CoinInfo
+import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
+import com.mutakindv.cryptofeed.domain.Raw
+import com.mutakindv.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -23,7 +32,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import retrofit2.HttpException
 
 class LoadCryptoFeedRemoteUseCaseTest {
 
@@ -123,6 +131,66 @@ class LoadCryptoFeedRemoteUseCaseTest {
         )
     }
 
+
+    private val remoteCryptoFeedResponse = listOf(
+        RemoteCryptoFeedItem(
+            remoteCoinInfo = RemoteCoinInfo("1", "BTC", "Bitcoin", "imageUrl"),
+            remoteRaw = RemoteDisplay(
+                usd = RemoteUsd(
+                    price = 1.0,
+                    changePctDay = 1F
+                )
+            )
+        ),
+        RemoteCryptoFeedItem(
+            remoteCoinInfo = RemoteCoinInfo("2", "BTC2", "Bitcoin 2", "imageUrl"),
+            remoteRaw = RemoteDisplay(
+                usd = RemoteUsd(
+                    price = 2.0,
+                    changePctDay = 2F
+                )
+            )
+        ),
+    )
+
+
+    private val cryptoFeedItems = listOf(
+        CryptoFeed(
+            coinInfo = CoinInfo("1", "BTC", "Bitcoin", "imageUrl"),
+            raw = Raw(
+                usd = Usd(
+                    price = 1.0,
+                    changePctDay = 1f
+                )
+            )
+        ),
+        CryptoFeed(
+            coinInfo = CoinInfo("2", "BTC2", "Bitcoin 2", "imageUrl"),
+            raw = Raw(
+                usd = Usd(
+                    price = 2.0,
+                    changePctDay = 2f
+                )
+            )
+        )
+    )
+
+    @Test
+    fun testLoadDeliverItemsOn200HttpResponseWithData() = runTest {
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClient = HttpClientResult.Success(
+                RemoteCryptoFeed(
+                    remoteCryptoFeedResponse
+                )
+            ),
+            expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
+            exactly = 1,
+            confirmVerified = client
+        )
+    }
+
     private fun expect(
         client: HttpClient,
         sut: LoadCryptoFeedRemoteUseCase,
@@ -138,7 +206,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         sut.load().test {
             when(val receivedResult = awaitItem()) {
                 is LoadCryptoFeedResult.Success -> {
-
+                    assertEquals(expectedResult::class.java, receivedResult::class.java)
                 }
                 is LoadCryptoFeedResult.Error -> {
                     assertEquals(expectedResult::class.java, receivedResult.exception::class.java)
