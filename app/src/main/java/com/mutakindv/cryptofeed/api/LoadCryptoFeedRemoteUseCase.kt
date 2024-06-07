@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 class ConnectivityException : Exception()
 class InvalidDataException : Exception()
 class BadRequestException : Exception()
+class NotFoundException : Exception()
 class InternalServerErrorException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
@@ -30,6 +31,9 @@ class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
                         }
                         is BadRequestException -> {
                             emit(LoadCryptoFeedResult.Error(BadRequest()))
+                        }
+                        is NotFoundException -> {
+                            emit(LoadCryptoFeedResult.Error(NotFound()))
                         }
                         is InternalServerErrorException -> {
                             emit(LoadCryptoFeedResult.Error(InternalServerError()))
@@ -56,5 +60,6 @@ private fun List<RemoteCryptoFeedItem>.toModels(): List<CryptoFeed> {
 class Connectivity : Exception()
 class InvalidData : Exception()
 class BadRequest : Exception()
+class NotFound : Exception()
 class InternalServerError : Exception()
 

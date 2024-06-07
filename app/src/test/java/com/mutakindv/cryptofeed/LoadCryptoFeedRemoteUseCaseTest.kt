@@ -12,6 +12,8 @@ import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
+import com.mutakindv.cryptofeed.api.NotFound
+import com.mutakindv.cryptofeed.api.NotFoundException
 import com.mutakindv.cryptofeed.api.RemoteCoinInfo
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
@@ -110,6 +112,15 @@ class LoadCryptoFeedRemoteUseCaseTest {
             sut = sut,
             receivedHttpClient = HttpClientResult.Failure(BadRequestException()),
             expectedResult = BadRequest(),
+            exactly = 1,
+        )
+    }
+    @Test
+    fun testLoadDeliverNotFoundError() = runTest {
+        expect(
+            sut = sut,
+            receivedHttpClient = HttpClientResult.Failure(NotFoundException()),
+            expectedResult = NotFound(),
             exactly = 1,
         )
     }
