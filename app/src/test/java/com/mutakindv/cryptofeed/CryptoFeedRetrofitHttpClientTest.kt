@@ -2,6 +2,7 @@ package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.ConnectivityException
+import com.mutakindv.cryptofeed.api.CryptoFeedService
 import com.mutakindv.cryptofeed.api.HttpClientResult
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,9 +15,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
-class CryptoFeedService {
-    fun get() {}
-}
 
 class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
     fun get(): Flow<HttpClientResult> = flow {
