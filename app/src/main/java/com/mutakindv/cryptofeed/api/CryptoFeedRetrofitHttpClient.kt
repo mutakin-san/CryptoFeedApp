@@ -19,6 +19,9 @@ class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
                         400 -> {
                             emit(HttpClientResult.Failure(BadRequestException()))
                         }
+                        404 -> {
+                            emit(HttpClientResult.Failure(NotFoundException()))
+                        }
                     }
                 }
             }

@@ -6,6 +6,7 @@ import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.CryptoFeedRetrofitHttpClient
 import com.mutakindv.cryptofeed.api.CryptoFeedService
 import com.mutakindv.cryptofeed.api.HttpClientResult
+import com.mutakindv.cryptofeed.api.NotFoundException
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -67,6 +68,24 @@ class CryptoFeedRetrofitHttpClientTest {
         sut.get().test {
             val receivedValue = awaitItem() as HttpClientResult.Failure
             assertEquals(BadRequestException()::class.java, receivedValue.exception::class.java)
+            awaitComplete()
+        }
+
+        coVerify(exactly = 1) {
+            service.get()
+        }
+    }
+
+    @Test
+    fun testGetFailsOn404HttpResponse() = runTest {
+        val response = Response.error<RemoteCryptoFeed>(404, ResponseBody.create(null, ""))
+        coEvery {
+            service.get()
+        } throws HttpException(response)
+
+        sut.get().test {
+            val receivedValue = awaitItem() as HttpClientResult.Failure
+            assertEquals(NotFoundException()::class.java, receivedValue.exception::class.java)
             awaitComplete()
         }
 
