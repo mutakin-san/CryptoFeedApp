@@ -22,7 +22,16 @@ class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
                         404 -> {
                             emit(HttpClientResult.Failure(NotFoundException()))
                         }
+                        422 -> {
+                            emit(HttpClientResult.Failure(InvalidDataException()))
+                        }
+                        500 -> {
+                            emit(HttpClientResult.Failure(InternalServerErrorException()))
+                        }
                     }
+                }
+                else -> {
+                    emit(HttpClientResult.Failure(UnexpectedException()))
                 }
             }
 

@@ -6,14 +6,14 @@ import com.mutakindv.cryptofeed.api.ConnectivityException
 import com.mutakindv.cryptofeed.api.CryptoFeedRetrofitHttpClient
 import com.mutakindv.cryptofeed.api.CryptoFeedService
 import com.mutakindv.cryptofeed.api.HttpClientResult
+import com.mutakindv.cryptofeed.api.InternalServerErrorException
+import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.NotFoundException
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
+import com.mutakindv.cryptofeed.api.UnexpectedException
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
@@ -22,9 +22,6 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
-
-
-
 
 class CryptoFeedRetrofitHttpClientTest {
     private val service = mockk<CryptoFeedService>()
@@ -51,7 +48,19 @@ class CryptoFeedRetrofitHttpClientTest {
     fun testGetFailsOn404HttpResponse() {
         expect(404, sut, NotFoundException())
     }
+    @Test
+    fun testGetFailsOn500HttpResponse() {
+        expect(500, sut, InternalServerErrorException())
+    }
 
+    @Test
+    fun testGetFailsOnInvalidDataError() {
+        expect(withStatusCode = 422, sut = sut, expectedResult  = InvalidDataException())
+    }
+    @Test
+    fun testGetFailsOnUnexpectedError() {
+        expect(sut = sut, expectedResult  = UnexpectedException())
+    }
 
     private fun expect(
         withStatusCode: Int? = null,
