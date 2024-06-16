@@ -1,15 +1,11 @@
 package com.mutakindv.cryptofeed
 
-import androidx.compose.runtime.MutableState
 import app.cash.turbine.test
-import com.mutakindv.cryptofeed.api.HttpClient
-import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +25,11 @@ data class UiState(
     val failed: String = "",
 )
 
-class CryptoFeedViewModel {
+class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase) {
+    fun load() {
+        useCase.load()
+    }
+
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 }
@@ -42,7 +42,7 @@ class CryptoFeedViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        sut = CryptoFeedViewModel()
+        sut = CryptoFeedViewModel(useCase)
     }
 
 
@@ -59,6 +59,20 @@ class CryptoFeedViewModelTest {
     @Test
     fun testInitDoesNotLoad() = runTest {
         verify(exactly = 0) {
+            useCase.load()
+        }
+
+        confirmVerified(useCase)
+    }
+
+    @Test
+    fun testLoadRequestData() = runTest{
+        every {
+            useCase.load()
+        } returns flowOf()
+
+        sut.load()
+        verify(exactly = 1) {
             useCase.load()
         }
 
