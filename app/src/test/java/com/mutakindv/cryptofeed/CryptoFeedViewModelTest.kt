@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -26,12 +29,17 @@ data class UiState(
 )
 
 class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase) {
-    fun load() {
-        useCase.load()
-    }
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    fun load() {
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
+        useCase.load()
+    }
+
 }
 
 
@@ -95,4 +103,30 @@ class CryptoFeedViewModelTest {
 
         confirmVerified(useCase)
     }
+
+
+     @Test
+    fun testLoadIsLoadingState() = runTest {
+        every {
+            useCase.load()
+        } returns flowOf()
+
+        sut.load()
+
+         sut.uiState.take(1).test {
+             val receivedResult = awaitItem()
+
+             assertEquals(true, receivedResult.isLoading)
+             awaitComplete()
+         }
+
+         verify(exactly = 1) {
+             useCase.load()
+         }
+
+        confirmVerified(useCase)
+    }
+
+
+
 }
