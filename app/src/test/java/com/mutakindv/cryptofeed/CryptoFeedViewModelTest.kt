@@ -3,6 +3,7 @@ package com.mutakindv.cryptofeed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
+import com.mutakindv.cryptofeed.api.BadRequest
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.domain.CryptoFeed
@@ -60,6 +61,7 @@ class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase): ViewModel() {
                                 failed = when(result.exception) {
                                     is Connectivity -> "Tidak ada internet"
                                     is InvalidData -> "Terjadi kesalahan"
+                                    is BadRequest -> "Permintaan gagal, coba lagi"
                                     else -> "Terjadi kesalahan!"
                             })
                         }
@@ -169,6 +171,13 @@ class CryptoFeedViewModelTest {
     fun testLoadFailedInvalidDataShowsInvalidDataError() = runTest {
         expect(LoadCryptoFeedResult.Error(InvalidData()), sut, false, "Terjadi kesalahan")
     }
+
+    @Test
+    fun testLoadBadRequestShowsBadRequestError() = runTest {
+        expect(LoadCryptoFeedResult.Error(BadRequest()), sut, false, "Permintaan gagal, coba lagi")
+    }
+
+
 
 
     private fun expect(
