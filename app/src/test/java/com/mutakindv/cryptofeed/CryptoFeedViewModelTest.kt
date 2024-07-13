@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadRequest
 import com.mutakindv.cryptofeed.api.Connectivity
+import com.mutakindv.cryptofeed.api.InternalServerError
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.NotFound
 import com.mutakindv.cryptofeed.domain.CryptoFeed
@@ -64,6 +65,7 @@ class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase): ViewModel() {
                                     is InvalidData -> "Terjadi kesalahan"
                                     is BadRequest -> "Permintaan gagal, coba lagi"
                                     is NotFound -> "Tidak ditemukan, coba lagi"
+                                    is InternalServerError -> "Server sedang dalam perbaikan, coba lagi"
                                     else -> "Terjadi kesalahan!"
                             })
                         }
@@ -182,6 +184,11 @@ class CryptoFeedViewModelTest {
     @Test
     fun testLoadNotFoundShowsNotFoundError() = runTest {
         expect(LoadCryptoFeedResult.Error(NotFound()), sut, false, "Tidak ditemukan, coba lagi")
+    }
+
+    @Test
+    fun testLoadInternalServerErrorShowsInternalServerError() = runTest {
+        expect(LoadCryptoFeedResult.Error(InternalServerError()), sut, false, "Server sedang dalam perbaikan, coba lagi")
     }
 
 
