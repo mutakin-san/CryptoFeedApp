@@ -8,6 +8,7 @@ import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.InternalServerError
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.NotFound
+import com.mutakindv.cryptofeed.api.Unexpected
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
@@ -66,7 +67,7 @@ class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase): ViewModel() {
                                     is BadRequest -> "Permintaan gagal, coba lagi"
                                     is NotFound -> "Tidak ditemukan, coba lagi"
                                     is InternalServerError -> "Server sedang dalam perbaikan, coba lagi"
-                                    else -> "Terjadi kesalahan!"
+                                    else -> "Terjadi kesalahan"
                             })
                         }
 
@@ -189,6 +190,11 @@ class CryptoFeedViewModelTest {
     @Test
     fun testLoadInternalServerErrorShowsInternalServerError() = runTest {
         expect(LoadCryptoFeedResult.Error(InternalServerError()), sut, false, "Server sedang dalam perbaikan, coba lagi")
+    }
+
+    @Test
+    fun testLoadUnexpectedErrorShowsUnexpectedError() = runTest {
+        expect(LoadCryptoFeedResult.Error(Unexpected()), sut, false, "Terjadi kesalahan")
     }
 
 
