@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadRequest
 import com.mutakindv.cryptofeed.api.Connectivity
 import com.mutakindv.cryptofeed.api.InvalidData
+import com.mutakindv.cryptofeed.api.NotFound
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
@@ -62,6 +63,7 @@ class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase): ViewModel() {
                                     is Connectivity -> "Tidak ada internet"
                                     is InvalidData -> "Terjadi kesalahan"
                                     is BadRequest -> "Permintaan gagal, coba lagi"
+                                    is NotFound -> "Tidak ditemukan, coba lagi"
                                     else -> "Terjadi kesalahan!"
                             })
                         }
@@ -175,6 +177,11 @@ class CryptoFeedViewModelTest {
     @Test
     fun testLoadBadRequestShowsBadRequestError() = runTest {
         expect(LoadCryptoFeedResult.Error(BadRequest()), sut, false, "Permintaan gagal, coba lagi")
+    }
+
+    @Test
+    fun testLoadNotFoundShowsNotFoundError() = runTest {
+        expect(LoadCryptoFeedResult.Error(NotFound()), sut, false, "Tidak ditemukan, coba lagi")
     }
 
 
