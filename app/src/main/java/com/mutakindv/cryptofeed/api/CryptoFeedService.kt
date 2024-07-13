@@ -1,5 +1,7 @@
 package com.mutakindv.cryptofeed.api
 
-class CryptoFeedService {
-    fun get() {}
+import kotlinx.coroutines.flow.Flow
+
+interface CryptoFeedService {
+    fun get(): Flow<HttpClientResult>
 }
