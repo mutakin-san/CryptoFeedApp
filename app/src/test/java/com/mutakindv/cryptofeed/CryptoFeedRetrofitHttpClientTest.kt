@@ -65,6 +65,20 @@ class CryptoFeedRetrofitHttpClientTest {
     }
 
     @Test
+    fun testLoadDeliverItemsOn200HttpResponseWithEmptyData() = runTest {
+        val remoteCryptoFeedResponse =  emptyList<RemoteCryptoFeedItem>()
+        expect(
+            withStatusCode = 200,
+            sut = sut,
+            expectedResult = HttpClientResult.Success(
+                RemoteCryptoFeed(
+                    remoteCryptoFeedResponse
+                )
+            ),
+        )
+    }
+
+    @Test
     fun testGetFailsOnConnectivityError() {
         expect(sut = sut, expectedResult =  HttpClientResult.Failure(ConnectivityException()))
     }
