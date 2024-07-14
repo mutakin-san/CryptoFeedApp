@@ -8,9 +8,8 @@ import java.io.IOException
 class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
     fun get(): Flow<HttpClientResult> = flow {
         try {
-            service.get().collect{
-                emit(it)
-            }
+            val result = service.get()
+            emit(HttpClientResult.Success(result))
         } catch (exception: Exception) {
             when(exception) {
                 is IOException -> {

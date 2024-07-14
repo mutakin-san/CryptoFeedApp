@@ -61,7 +61,11 @@ class CryptoFeedRetrofitHttpClientTest {
             ),
         )
 
-        expect(withStatusCode = 200, sut= sut, expectedResult = HttpClientResult.Success(root = RemoteCryptoFeed(remoteCryptoFeedResponse)))
+        expect(
+            withStatusCode = 200,
+            sut= sut,
+            expectedResult = RemoteCryptoFeed(remoteCryptoFeedResponse)
+        )
     }
 
     @Test
@@ -70,47 +74,43 @@ class CryptoFeedRetrofitHttpClientTest {
         expect(
             withStatusCode = 200,
             sut = sut,
-            expectedResult = HttpClientResult.Success(
-                RemoteCryptoFeed(
-                    remoteCryptoFeedResponse
-                )
-            ),
+            expectedResult = RemoteCryptoFeed(remoteCryptoFeedResponse),
         )
     }
 
     @Test
     fun testGetFailsOnConnectivityError() {
-        expect(sut = sut, expectedResult =  HttpClientResult.Failure(ConnectivityException()))
+        expect(sut = sut, expectedResult =  ConnectivityException())
     }
 
 
     @Test
     fun testGetFailsOn400HttpResponse() {
-        expect(400, sut, HttpClientResult.Failure(BadRequestException()))
+        expect(400, sut, BadRequestException())
     }
 
     @Test
     fun testGetFailsOn404HttpResponse() {
-        expect(404, sut, HttpClientResult.Failure(NotFoundException()))
+        expect(404, sut, NotFoundException())
     }
     @Test
     fun testGetFailsOn500HttpResponse() {
-        expect(500, sut, HttpClientResult.Failure(InternalServerErrorException()))
+        expect(500, sut, InternalServerErrorException())
     }
 
     @Test
     fun testGetFailsOnInvalidDataError() {
-        expect(withStatusCode = 422, sut = sut, expectedResult  = HttpClientResult.Failure(InvalidDataException()))
+        expect(withStatusCode = 422, sut = sut, expectedResult  = InvalidDataException())
     }
     @Test
     fun testGetFailsOnUnexpectedError() {
-        expect(sut = sut, expectedResult  = HttpClientResult.Failure(UnexpectedException()))
+        expect(sut = sut, expectedResult  = UnexpectedException())
     }
 
     private fun expect(
         withStatusCode: Int? = null,
         sut: CryptoFeedRetrofitHttpClient,
-        expectedResult: HttpClientResult
+        expectedResult: Any
     ) = runTest {
         when {
             withStatusCode != null -> {
@@ -118,7 +118,7 @@ class CryptoFeedRetrofitHttpClientTest {
                     200 -> {
                         coEvery {
                             service.get()
-                        } returns flowOf(expectedResult)
+                        } returns (expectedResult as RemoteCryptoFeed)
                     }
                     else -> {
                         val response = Response.error<RemoteCryptoFeed>(withStatusCode, ResponseBody.create(null, ""))
@@ -128,29 +128,22 @@ class CryptoFeedRetrofitHttpClientTest {
                     }
                 }
             }
-            expectedResult is HttpClientResult.Failure -> {
-                when(expectedResult.exception) {
-                    is ConnectivityException -> {
-                        coEvery {
-                            service.get()
-                        } throws IOException()
-                    }
-                }
+            expectedResult is ConnectivityException -> {
+                coEvery {
+                    service.get()
+                } throws IOException()
             }
         }
 
         sut.get().test {
-            when(expectedResult) {
+            when(val receivedValue = awaitItem()) {
                 is HttpClientResult.Success -> {
-                    val receivedValue = awaitItem() as HttpClientResult.Success
-                    assertEquals(expectedResult.root::class.java, receivedValue.root::class.java)
+                    assertEquals((expectedResult as RemoteCryptoFeed)::class.java, receivedValue.root::class.java)
+                    assertEquals(expectedResult.data, receivedValue.root.data)
                 }
                 is HttpClientResult.Failure -> {
-                    val receivedValue = awaitItem() as HttpClientResult.Failure
-                    assertEquals(expectedResult.exception::class.java, receivedValue.exception::class.java)
-
+                    assertEquals((expectedResult as Exception)::class.java, receivedValue.exception::class.java)
                 }
-
             }
             awaitComplete()
         }
