@@ -1,7 +1,5 @@
 package com.mutakindv.cryptofeed
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadRequest
 import com.mutakindv.cryptofeed.api.Connectivity
@@ -9,7 +7,6 @@ import com.mutakindv.cryptofeed.api.InternalServerError
 import com.mutakindv.cryptofeed.api.InvalidData
 import com.mutakindv.cryptofeed.api.NotFound
 import com.mutakindv.cryptofeed.api.Unexpected
-import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
 import com.mutakindv.cryptofeed.presentation.CryptoFeedViewModel
@@ -20,13 +17,8 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -126,32 +118,32 @@ class CryptoFeedViewModelTest {
 
     @Test
     fun testLoadFailedConnectivityShowsConnectivityError() = runTest {
-        expect(LoadCryptoFeedResult.Error(Connectivity()), sut, false, "Tidak ada internet")
+        expect(LoadCryptoFeedResult.Error(Connectivity()), sut, "Tidak ada internet")
     }
 
     @Test
     fun testLoadFailedInvalidDataShowsInvalidDataError() = runTest {
-        expect(LoadCryptoFeedResult.Error(InvalidData()), sut, false, "Terjadi kesalahan")
+        expect(LoadCryptoFeedResult.Error(InvalidData()), sut, "Terjadi kesalahan")
     }
 
     @Test
     fun testLoadBadRequestShowsBadRequestError() = runTest {
-        expect(LoadCryptoFeedResult.Error(BadRequest()), sut, false, "Permintaan gagal, coba lagi")
+        expect(LoadCryptoFeedResult.Error(BadRequest()), sut, "Permintaan gagal, coba lagi")
     }
 
     @Test
     fun testLoadNotFoundShowsNotFoundError() = runTest {
-        expect(LoadCryptoFeedResult.Error(NotFound()), sut, false, "Tidak ditemukan, coba lagi")
+        expect(LoadCryptoFeedResult.Error(NotFound()), sut, "Tidak ditemukan, coba lagi")
     }
 
     @Test
     fun testLoadInternalServerErrorShowsInternalServerError() = runTest {
-        expect(LoadCryptoFeedResult.Error(InternalServerError()), sut, false, "Server sedang dalam perbaikan, coba lagi")
+        expect(LoadCryptoFeedResult.Error(InternalServerError()), sut, "Server sedang dalam perbaikan, coba lagi")
     }
 
     @Test
     fun testLoadUnexpectedErrorShowsUnexpectedError() = runTest {
-        expect(LoadCryptoFeedResult.Error(Unexpected()), sut, false, "Terjadi kesalahan")
+        expect(LoadCryptoFeedResult.Error(Unexpected()), sut, "Terjadi kesalahan")
     }
 
 
@@ -160,7 +152,6 @@ class CryptoFeedViewModelTest {
     private fun expect(
         result: LoadCryptoFeedResult,
         sut: CryptoFeedViewModel,
-        expectedLoadingResult: Boolean,
         expectedFailedResult: String
     ) = runTest {
         every {
@@ -171,7 +162,7 @@ class CryptoFeedViewModelTest {
 
         sut.uiState.take(1).test {
             val receivedResult = awaitItem()
-            assertEquals(expectedLoadingResult, receivedResult.isLoading)
+            assertEquals(false, receivedResult.isLoading)
             assertEquals(expectedFailedResult, receivedResult.failed)
             awaitComplete()
         }
