@@ -12,6 +12,7 @@ import com.mutakindv.cryptofeed.api.Unexpected
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
+import com.mutakindv.cryptofeed.presentation.CryptoFeedViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -34,50 +35,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-
-
-data class UiState(
-    val isLoading: Boolean = false,
-    val cryptoFeed: List<CryptoFeed> = emptyList(),
-    val failed: String = "",
-)
-
-class CryptoFeedViewModel(val useCase: LoadCryptoFeedUseCase): ViewModel() {
-
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
-
-    fun load() {
-        viewModelScope.launch {
-
-            _uiState.update {
-                it.copy(isLoading = true)
-            }
-
-            useCase.load().collect { result ->
-                _uiState.update {
-                    when(result) {
-                        is LoadCryptoFeedResult.Success -> TODO()
-                        is LoadCryptoFeedResult.Error -> {
-                            it.copy(
-                                isLoading = false,
-                                failed = when(result.exception) {
-                                    is Connectivity -> "Tidak ada internet"
-                                    is InvalidData -> "Terjadi kesalahan"
-                                    is BadRequest -> "Permintaan gagal, coba lagi"
-                                    is NotFound -> "Tidak ditemukan, coba lagi"
-                                    is InternalServerError -> "Server sedang dalam perbaikan, coba lagi"
-                                    else -> "Terjadi kesalahan"
-                            })
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
-}
 
 
 class CryptoFeedViewModelTest {
