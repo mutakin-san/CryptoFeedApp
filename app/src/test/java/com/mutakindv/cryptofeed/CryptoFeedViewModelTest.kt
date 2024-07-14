@@ -147,6 +147,11 @@ class CryptoFeedViewModelTest {
     }
 
 
+    @Test
+    fun testLoadSuccessShowCryptoFeeds() = runTest {
+        expect(LoadCryptoFeedResult.Success(cryptoFeedItems), sut, "")
+    }
+
 
 
     private fun expect(
@@ -162,8 +167,14 @@ class CryptoFeedViewModelTest {
 
         sut.uiState.take(1).test {
             val receivedResult = awaitItem()
-            assertEquals(false, receivedResult.isLoading)
-            assertEquals(expectedFailedResult, receivedResult.failed)
+            if(receivedResult.cryptoFeed.isNotEmpty()) {
+                assertEquals(false, receivedResult.isLoading)
+                assertEquals(cryptoFeedItems, receivedResult.cryptoFeed)
+                assertEquals(expectedFailedResult, receivedResult.failed)
+            } else {
+                assertEquals(false, receivedResult.isLoading)
+                assertEquals(expectedFailedResult, receivedResult.failed)
+            }
             awaitComplete()
         }
 
