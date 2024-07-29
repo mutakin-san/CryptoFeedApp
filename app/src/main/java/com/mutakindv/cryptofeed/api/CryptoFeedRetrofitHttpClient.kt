@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
 
-class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
-    fun get(): Flow<HttpClientResult> = flow {
+class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService): HttpClient {
+    override fun get(): Flow<HttpClientResult> = flow {
         try {
             val result = service.get()
-            emit(HttpClientResult.Success(result))
+            emit(HttpClientResult.Success(toRemoteCryptoFeed(result)))
         } catch (exception: Exception) {
             when(exception) {
                 is IOException -> {
@@ -38,5 +38,21 @@ class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService) {
 
         }
     }
-
+    private fun toRemoteCryptoFeed(response: RootCryptoFeedResponse): RootRemoteCryptoFeed {
+        return RootRemoteCryptoFeed( data = response.data.map {
+            RemoteCryptoFeed(
+                remoteCoinInfo = RemoteCoinInfo(
+                    id = it.coinInfoResponse.id,
+                    name = it.coinInfoResponse.name,
+                    fullName = it.coinInfoResponse.fullName,
+                    imageUrl = it.coinInfoResponse.imageUrl
+                ),
+                remoteRaw = RemoteDisplay(usd = RemoteUsd(
+                    price = it.rawResponse.usdResponse.price,
+                    changePctDay = it.rawResponse.usdResponse.changePctDay
+                ))
+            )
+        } )
+    }
 }
+

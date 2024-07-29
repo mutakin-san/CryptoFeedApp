@@ -14,18 +14,12 @@ import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import com.mutakindv.cryptofeed.api.NotFound
 import com.mutakindv.cryptofeed.api.NotFoundException
-import com.mutakindv.cryptofeed.api.RemoteCoinInfo
+import com.mutakindv.cryptofeed.api.RootRemoteCryptoFeed
 import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
-import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
-import com.mutakindv.cryptofeed.api.RemoteDisplay
-import com.mutakindv.cryptofeed.api.RemoteUsd
 import com.mutakindv.cryptofeed.api.Unexpected
 import com.mutakindv.cryptofeed.api.UnexpectedException
-import com.mutakindv.cryptofeed.domain.CoinInfo
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
-import com.mutakindv.cryptofeed.domain.Raw
-import com.mutakindv.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -153,7 +147,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             sut = sut,
             receivedHttpClient = HttpClientResult.Success(
-                RemoteCryptoFeed(
+                RootRemoteCryptoFeed(
                     remoteCryptoFeedResponse
                 )
             ),
@@ -164,12 +158,12 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Test
     fun testLoadDeliverItemsOn200HttpResponseWithEmptyData() = runTest {
-        val remoteCryptoFeedResponse =  emptyList<RemoteCryptoFeedItem>()
+        val remoteCryptoFeedResponse =  emptyList<RemoteCryptoFeed>()
         val cryptoFeedItems = emptyList<CryptoFeed>()
         expect(
             sut = sut,
             receivedHttpClient = HttpClientResult.Success(
-                RemoteCryptoFeed(
+                RootRemoteCryptoFeed(
                     remoteCryptoFeedResponse
                 )
             ),

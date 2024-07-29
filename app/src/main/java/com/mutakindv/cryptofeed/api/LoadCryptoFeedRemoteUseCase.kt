@@ -52,7 +52,7 @@ class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
 }
 
 
-private fun List<RemoteCryptoFeedItem>.toModels(): List<CryptoFeed> {
+private fun List<RemoteCryptoFeed>.toModels(): List<CryptoFeed> {
     return map {
         CryptoFeed(
             coinInfo = CoinInfo(it.remoteCoinInfo.id, it.remoteCoinInfo.name, it.remoteCoinInfo.fullName, it.remoteCoinInfo.imageUrl),

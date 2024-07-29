@@ -1,12 +1,8 @@
 package com.mutakindv.cryptofeed.api
 
-import com.squareup.moshi.Json
-
-
+class RootRemoteCryptoFeed(
+    val data: List<RemoteCryptoFeed>)
 class RemoteCryptoFeed(
-    @Json(name = "Data")
-    val data: List<RemoteCryptoFeedItem>)
-class RemoteCryptoFeedItem(
     val remoteCoinInfo: RemoteCoinInfo,
     val remoteRaw: RemoteDisplay
 )

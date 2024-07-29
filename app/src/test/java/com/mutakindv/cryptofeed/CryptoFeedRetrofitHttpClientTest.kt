@@ -3,22 +3,19 @@ package com.mutakindv.cryptofeed
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadRequestException
 import com.mutakindv.cryptofeed.api.ConnectivityException
+import com.mutakindv.cryptofeed.api.CryptoFeedResponse
 import com.mutakindv.cryptofeed.api.CryptoFeedRetrofitHttpClient
 import com.mutakindv.cryptofeed.api.CryptoFeedService
 import com.mutakindv.cryptofeed.api.HttpClientResult
 import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.NotFoundException
-import com.mutakindv.cryptofeed.api.RemoteCoinInfo
-import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
-import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
-import com.mutakindv.cryptofeed.api.RemoteDisplay
-import com.mutakindv.cryptofeed.api.RemoteUsd
+import com.mutakindv.cryptofeed.api.RootRemoteCryptoFeed
+import com.mutakindv.cryptofeed.api.RootCryptoFeedResponse
 import com.mutakindv.cryptofeed.api.UnexpectedException
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
@@ -40,42 +37,22 @@ class CryptoFeedRetrofitHttpClientTest {
 
     @Test
     fun testLoadDeliverItemsOn200HttpResponseWithData() {
-        val remoteCryptoFeedResponse = listOf(
-            RemoteCryptoFeedItem(
-                remoteCoinInfo = RemoteCoinInfo("1", "BTC", "Bitcoin", "imageUrl"),
-                remoteRaw = RemoteDisplay(
-                    usd = RemoteUsd(
-                        price = 1.0,
-                        changePctDay = 1F
-                    )
-                )
-            ),
-            RemoteCryptoFeedItem(
-                remoteCoinInfo = RemoteCoinInfo("2", "BTC2", "Bitcoin 2", "imageUrl"),
-                remoteRaw = RemoteDisplay(
-                    usd = RemoteUsd(
-                        price = 2.0,
-                        changePctDay = 2F
-                    )
-                )
-            ),
-        )
 
         expect(
-            withStatusCode = 200,
             sut= sut,
-            expectedResult = RemoteCryptoFeed(remoteCryptoFeedResponse)
+            expectedResult = HttpClientResult.Success(RootRemoteCryptoFeed(remoteCryptoFeedResponse)),
+            receivedResult = RootCryptoFeedResponse(cryptoFeedResponses),
         )
     }
 
     @Test
     fun testLoadDeliverItemsOn200HttpResponseWithEmptyData() = runTest {
-        val remoteCryptoFeedResponse =  emptyList<RemoteCryptoFeedItem>()
+        val cryptoFeedResponse =  emptyList<CryptoFeedResponse>()
         expect(
-            withStatusCode = 200,
             sut = sut,
-            expectedResult = RemoteCryptoFeed(remoteCryptoFeedResponse),
-        )
+            expectedResult = HttpClientResult.Success(RootRemoteCryptoFeed(emptyList())),
+            receivedResult = RootCryptoFeedResponse(cryptoFeedResponse),
+            )
     }
 
     @Test
@@ -110,39 +87,36 @@ class CryptoFeedRetrofitHttpClientTest {
     private fun expect(
         withStatusCode: Int? = null,
         sut: CryptoFeedRetrofitHttpClient,
-        expectedResult: Any
+        expectedResult: Any,
+        receivedResult: Any? = null,
     ) = runTest {
         when {
             withStatusCode != null -> {
-                when(withStatusCode) {
-                    200 -> {
-                        coEvery {
-                            service.get()
-                        } returns (expectedResult as RemoteCryptoFeed)
-                    }
-                    else -> {
-                        val response = Response.error<RemoteCryptoFeed>(withStatusCode, ResponseBody.create(null, ""))
-                        coEvery {
-                            service.get()
-                        } throws HttpException(response)
-                    }
-                }
+                val response = Response.error<RootRemoteCryptoFeed>(withStatusCode, ResponseBody.create(null, ""))
+                coEvery {
+                    service.get()
+                } throws HttpException(response)
+
             }
             expectedResult is ConnectivityException -> {
                 coEvery {
                     service.get()
                 } throws IOException()
             }
+            expectedResult is HttpClientResult.Success -> {
+                coEvery {
+                    service.get()
+                } returns (receivedResult as RootCryptoFeedResponse)
+            }
         }
 
         sut.get().test {
             when(val receivedValue = awaitItem()) {
                 is HttpClientResult.Success -> {
-                    assertEquals((expectedResult as RemoteCryptoFeed)::class.java, receivedValue.root::class.java)
-                    assertEquals(expectedResult.data, receivedValue.root.data)
+                    assertEquals(expectedResult::class.java, receivedValue::class.java)
                 }
                 is HttpClientResult.Failure -> {
-                    assertEquals((expectedResult as Exception)::class.java, receivedValue.exception::class.java)
+                    assertEquals(expectedResult::class.java, receivedValue.exception::class.java)
                 }
             }
             awaitComplete()

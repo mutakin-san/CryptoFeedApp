@@ -1,12 +1,12 @@
 package com.mutakindv.cryptofeed
 
 import com.mutakindv.cryptofeed.api.RemoteCoinInfo
-import com.mutakindv.cryptofeed.api.RemoteCryptoFeedItem
+import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
 import com.mutakindv.cryptofeed.api.RemoteDisplay
 import com.mutakindv.cryptofeed.api.RemoteUsd
 
 val remoteCryptoFeedResponse = listOf(
-    RemoteCryptoFeedItem(
+    RemoteCryptoFeed(
         remoteCoinInfo = RemoteCoinInfo("1", "BTC", "Bitcoin", "imageUrl"),
         remoteRaw = RemoteDisplay(
             usd = RemoteUsd(
@@ -15,7 +15,7 @@ val remoteCryptoFeedResponse = listOf(
             )
         )
     ),
-    RemoteCryptoFeedItem(
+    RemoteCryptoFeed(
         remoteCoinInfo = RemoteCoinInfo("2", "BTC2", "Bitcoin 2", "imageUrl"),
         remoteRaw = RemoteDisplay(
             usd = RemoteUsd(
