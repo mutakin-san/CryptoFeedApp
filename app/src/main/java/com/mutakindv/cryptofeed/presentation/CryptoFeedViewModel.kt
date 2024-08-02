@@ -2,11 +2,11 @@ package com.mutakindv.cryptofeed.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mutakindv.cryptofeed.api.BadRequest
-import com.mutakindv.cryptofeed.api.Connectivity
-import com.mutakindv.cryptofeed.api.InternalServerError
-import com.mutakindv.cryptofeed.api.InvalidData
-import com.mutakindv.cryptofeed.api.NotFound
+import com.mutakindv.cryptofeed.domain.BadRequest
+import com.mutakindv.cryptofeed.domain.Connectivity
+import com.mutakindv.cryptofeed.domain.InternalServerError
+import com.mutakindv.cryptofeed.domain.InvalidData
+import com.mutakindv.cryptofeed.domain.NotFound
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase

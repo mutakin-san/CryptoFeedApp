@@ -1,12 +1,12 @@
 package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
-import com.mutakindv.cryptofeed.api.BadRequest
-import com.mutakindv.cryptofeed.api.Connectivity
-import com.mutakindv.cryptofeed.api.InternalServerError
-import com.mutakindv.cryptofeed.api.InvalidData
-import com.mutakindv.cryptofeed.api.NotFound
-import com.mutakindv.cryptofeed.api.Unexpected
+import com.mutakindv.cryptofeed.domain.BadRequest
+import com.mutakindv.cryptofeed.domain.Connectivity
+import com.mutakindv.cryptofeed.domain.InternalServerError
+import com.mutakindv.cryptofeed.domain.InvalidData
+import com.mutakindv.cryptofeed.domain.NotFound
+import com.mutakindv.cryptofeed.domain.Unexpected
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedUseCase
 import com.mutakindv.cryptofeed.presentation.CryptoFeedViewModel

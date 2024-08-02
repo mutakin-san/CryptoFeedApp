@@ -1,19 +1,19 @@
 package com.mutakindv.cryptofeed.api
 
+import com.mutakindv.cryptofeed.domain.BadRequest
 import com.mutakindv.cryptofeed.domain.CoinInfo
+import com.mutakindv.cryptofeed.domain.Connectivity
 import com.mutakindv.cryptofeed.domain.CryptoFeed
+import com.mutakindv.cryptofeed.domain.InternalServerError
+import com.mutakindv.cryptofeed.domain.InvalidData
 import com.mutakindv.cryptofeed.domain.LoadCryptoFeedResult
+import com.mutakindv.cryptofeed.domain.NotFound
 import com.mutakindv.cryptofeed.domain.Raw
+import com.mutakindv.cryptofeed.domain.Unexpected
 import com.mutakindv.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class ConnectivityException : Exception()
-class InvalidDataException : Exception()
-class BadRequestException : Exception()
-class NotFoundException : Exception()
-class InternalServerErrorException : Exception()
-class UnexpectedException : Exception()
 
 class LoadCryptoFeedRemoteUseCase(private val client: HttpClient) {
     fun load() : Flow<LoadCryptoFeedResult> = flow {
@@ -60,11 +60,4 @@ private fun List<RemoteCryptoFeed>.toModels(): List<CryptoFeed> {
         )
     }
 }
-
-class Connectivity : Exception()
-class InvalidData : Exception()
-class BadRequest : Exception()
-class NotFound : Exception()
-class InternalServerError : Exception()
-class Unexpected : Exception()
 
