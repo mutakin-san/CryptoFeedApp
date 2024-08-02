@@ -1,4 +1,4 @@
-package com.mutakindv.cryptofeed.api
+package com.mutakindv.cryptofeed.api_infra
 
 
 interface CryptoFeedService {

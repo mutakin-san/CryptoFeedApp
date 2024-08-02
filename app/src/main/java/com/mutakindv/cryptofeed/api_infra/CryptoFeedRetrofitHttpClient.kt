@@ -1,5 +1,18 @@
-package com.mutakindv.cryptofeed.api
+package com.mutakindv.cryptofeed.api_infra
 
+import com.mutakindv.cryptofeed.api.BadRequestException
+import com.mutakindv.cryptofeed.api.ConnectivityException
+import com.mutakindv.cryptofeed.api.HttpClient
+import com.mutakindv.cryptofeed.api.HttpClientResult
+import com.mutakindv.cryptofeed.api.InternalServerErrorException
+import com.mutakindv.cryptofeed.api.InvalidDataException
+import com.mutakindv.cryptofeed.api.NotFoundException
+import com.mutakindv.cryptofeed.api.RemoteCoinInfo
+import com.mutakindv.cryptofeed.api.RemoteCryptoFeed
+import com.mutakindv.cryptofeed.api.RemoteDisplay
+import com.mutakindv.cryptofeed.api.RemoteUsd
+import com.mutakindv.cryptofeed.api.RootRemoteCryptoFeed
+import com.mutakindv.cryptofeed.api.UnexpectedException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -50,7 +63,8 @@ class CryptoFeedRetrofitHttpClient(private val service: CryptoFeedService): Http
                 remoteRaw = RemoteDisplay(usd = RemoteUsd(
                     price = it.rawResponse.usdResponse.price,
                     changePctDay = it.rawResponse.usdResponse.changePctDay
-                ))
+                )
+                )
             )
         } )
     }

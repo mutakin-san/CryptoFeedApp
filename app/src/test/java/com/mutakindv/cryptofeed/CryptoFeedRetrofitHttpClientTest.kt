@@ -3,15 +3,15 @@ package com.mutakindv.cryptofeed
 import app.cash.turbine.test
 import com.mutakindv.cryptofeed.api.BadRequestException
 import com.mutakindv.cryptofeed.api.ConnectivityException
-import com.mutakindv.cryptofeed.api.CryptoFeedResponse
-import com.mutakindv.cryptofeed.api.CryptoFeedRetrofitHttpClient
-import com.mutakindv.cryptofeed.api.CryptoFeedService
+import com.mutakindv.cryptofeed.api_infra.CryptoFeedResponse
+import com.mutakindv.cryptofeed.api_infra.CryptoFeedRetrofitHttpClient
+import com.mutakindv.cryptofeed.api_infra.CryptoFeedService
 import com.mutakindv.cryptofeed.api.HttpClientResult
 import com.mutakindv.cryptofeed.api.InternalServerErrorException
 import com.mutakindv.cryptofeed.api.InvalidDataException
 import com.mutakindv.cryptofeed.api.NotFoundException
 import com.mutakindv.cryptofeed.api.RootRemoteCryptoFeed
-import com.mutakindv.cryptofeed.api.RootCryptoFeedResponse
+import com.mutakindv.cryptofeed.api_infra.RootCryptoFeedResponse
 import com.mutakindv.cryptofeed.api.UnexpectedException
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -113,7 +113,7 @@ class CryptoFeedRetrofitHttpClientTest {
         sut.get().test {
             when(val receivedValue = awaitItem()) {
                 is HttpClientResult.Success -> {
-                    assertEquals(expectedResult::class.java, receivedValue::class.java)
+                    assertEquals(expectedResult, receivedValue)
                 }
                 is HttpClientResult.Failure -> {
                     assertEquals(expectedResult::class.java, receivedValue.exception::class.java)
