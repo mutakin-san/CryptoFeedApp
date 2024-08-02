@@ -1,8 +1,8 @@
 package com.mutakindv.cryptofeed.api
 
-class RootRemoteCryptoFeed(
+data class RootRemoteCryptoFeed(
     val data: List<RemoteCryptoFeed>)
-class RemoteCryptoFeed(
+data class RemoteCryptoFeed(
     val remoteCoinInfo: RemoteCoinInfo,
     val remoteRaw: RemoteDisplay
 )
@@ -18,7 +18,7 @@ data class RemoteDisplay(
     val usd: RemoteUsd
 )
 
-class RemoteUsd(
+data class RemoteUsd(
     val price: Double,
     val changePctDay: Float
 )

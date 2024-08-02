@@ -1,11 +1,11 @@
-package com.mutakindv.cryptofeed.api
+package com.mutakindv.cryptofeed.api_infra
 
 import com.squareup.moshi.Json
 
-class RootCryptoFeedResponse(
+data class RootCryptoFeedResponse(
     @Json(name = "Data")
     val data: List<CryptoFeedResponse>)
-class CryptoFeedResponse(
+data class CryptoFeedResponse(
     @Json(name = "CoinInfo")
     val coinInfoResponse: CoinInfoResponse,
     @Json(name = "Raw")
@@ -29,7 +29,7 @@ data class RawResponse(
     val usdResponse: UsdResponse
 )
 
-class UsdResponse(
+data class UsdResponse(
     @Json(name = "PRICE")
     val price: Double,
     @Json(name = "CHANGEPCTDAY")
