@@ -1,5 +1,7 @@
 package com.mutakindv.cryptofeed
 
+import com.mutakindv.cryptofeed.cache.CryptoFeedCacheUseCase
+import com.mutakindv.cryptofeed.cache.CryptoFeedStore
 import com.mutakindv.cryptofeed.domain.CoinInfo
 import com.mutakindv.cryptofeed.domain.CryptoFeed
 import com.mutakindv.cryptofeed.domain.Raw
@@ -14,22 +16,10 @@ import org.junit.Test
 import java.util.UUID
 
 
-interface CryptoFeedCache {
 
-    fun deleteCache()
+class CryptoFeedStoreUseCaseTest {
 
-}
-
-class CryptoFeedCacheUseCase(private val store: CryptoFeedCache) {
-    fun save(feeds: List<CryptoFeed>) {
-        store.deleteCache()
-    }
-
-}
-
-class CryptoFeedCacheUseCaseTest {
-
-    private val cache: CryptoFeedCache = spyk<CryptoFeedCache>()
+    private val cache: CryptoFeedStore = spyk<CryptoFeedStore>()
     private lateinit var sut: CryptoFeedCacheUseCase
 
     @Before
