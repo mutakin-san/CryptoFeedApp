@@ -8,12 +8,12 @@ import java.util.Date
 class CacheCryptoFeedUseCase(private val store: CryptoFeedStore, private val currentDate: Date) {
     fun save(feeds: List<CryptoFeed>): Flow<Exception?> = flow {
         store.deleteCache().collect { error ->
-            if (error == null) {
+            if (error != null) {
+                emit(error)
+            } else {
                 store.insert(feeds, currentDate).collect { insertionError ->
                     emit(insertionError)
                 }
-            } else {
-                emit(error)
             }
         }
     }
