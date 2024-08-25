@@ -8,7 +8,7 @@ class CryptoFeedCacheUseCase(private val store: CryptoFeedStore) {
     fun save(feeds: List<CryptoFeed>): Flow<Exception> = flow {
         store.deleteCache().collect { error ->
             if (error == null) {
-                store.insert()
+                store.insert(feeds)
             }
         }
     }

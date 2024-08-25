@@ -10,10 +10,12 @@ import com.mutakindv.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.UUID
@@ -120,7 +122,7 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 0) {
-            cache.insert()
+            cache.insert(feeds)
         }
 
         confirmVerified(cache)
@@ -129,16 +131,19 @@ class CryptoFeedStoreUseCaseTest {
 
     @Test
     fun testSaveRequestNewCacheInsertionOnSuccessfulDeletion() = runTest {
+        val captureFeeds = slot<List<CryptoFeed>>()
+
         every {
             cache.deleteCache()
         } returns flowOf(null)
 
         every {
-            cache.insert()
+            cache.insert(capture(captureFeeds))
         } returns flowOf()
 
 
         sut.save(feeds).test {
+            assertEquals(feeds, captureFeeds.captured)
             awaitComplete()
         }
 
@@ -147,7 +152,7 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 1) {
-            cache.insert()
+            cache.insert(feeds)
         }
 
         confirmVerified(cache)
