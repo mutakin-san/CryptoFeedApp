@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 import java.util.UUID
 
 
@@ -49,10 +50,12 @@ class CryptoFeedStoreUseCaseTest {
         )
     )
 
+    val timestamp = Date()
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        sut = CacheCryptoFeedUseCase(cache)
+        sut = CacheCryptoFeedUseCase(cache, timestamp)
     }
 
 
@@ -76,6 +79,7 @@ class CryptoFeedStoreUseCaseTest {
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
+            assertEquals(Exception::class.java, awaitItem()!!::class.java)
             awaitComplete()
         }
 
@@ -115,6 +119,7 @@ class CryptoFeedStoreUseCaseTest {
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
+            assertEquals(Exception::class.java, awaitItem()!!::class.java)
             awaitComplete()
         }
         verify(exactly = 1) {
@@ -122,7 +127,7 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 0) {
-            cache.insert(feeds)
+            cache.insert(feeds, timestamp)
         }
 
         confirmVerified(cache)
@@ -132,13 +137,14 @@ class CryptoFeedStoreUseCaseTest {
     @Test
     fun testSaveRequestNewCacheInsertionOnSuccessfulDeletion() = runTest {
         val captureFeeds = slot<List<CryptoFeed>>()
+        val captureTimestamp = slot<Date>()
 
         every {
             cache.deleteCache()
         } returns flowOf(null)
 
         every {
-            cache.insert(capture(captureFeeds))
+            cache.insert(capture(captureFeeds), capture(captureTimestamp))
         } returns flowOf()
 
 
@@ -152,7 +158,7 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 1) {
-            cache.insert(feeds)
+            cache.insert(feeds, timestamp)
         }
 
         confirmVerified(cache)
