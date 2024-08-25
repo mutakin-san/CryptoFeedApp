@@ -16,6 +16,7 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -25,11 +26,11 @@ import java.util.UUID
 
 class CryptoFeedStoreUseCaseTest {
 
-    private val cache: CryptoFeedStore = spyk<CryptoFeedStore>()
+    private val store: CryptoFeedStore = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
 
-    val feeds = listOf(
+    private val feeds = listOf(
         CryptoFeed(
             coinInfo = CoinInfo(UUID.randomUUID().toString(), "BTC", "Bitcoin", "imageUrl"),
             raw = Raw(
@@ -55,7 +56,7 @@ class CryptoFeedStoreUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        sut = CacheCryptoFeedUseCase(cache, timestamp)
+        sut = CacheCryptoFeedUseCase(store, timestamp)
     }
 
 
@@ -63,10 +64,10 @@ class CryptoFeedStoreUseCaseTest {
     fun testInitDoesNotDeleteCacheWhenCalled() = runTest {
 
         verify(exactly = 0) {
-            cache.deleteCache()
+            store.deleteCache()
         }
 
-        confirmVerified(cache)
+        confirmVerified(store)
 
     }
 
@@ -75,7 +76,7 @@ class CryptoFeedStoreUseCaseTest {
     fun testSaveCacheRequestDeletion() = runTest {
 
         every {
-            cache.deleteCache()
+            store.deleteCache()
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
@@ -84,10 +85,10 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 1) {
-            cache.deleteCache()
+            store.deleteCache()
         }
 
-        confirmVerified(cache)
+        confirmVerified(store)
     }
 
     @Test
@@ -115,7 +116,7 @@ class CryptoFeedStoreUseCaseTest {
         )
 
         every {
-            cache.deleteCache()
+            store.deleteCache()
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
@@ -123,14 +124,14 @@ class CryptoFeedStoreUseCaseTest {
             awaitComplete()
         }
         verify(exactly = 1) {
-            cache.deleteCache()
+            store.deleteCache()
         }
 
         verify(exactly = 0) {
-            cache.insert(feeds, timestamp)
+            store.insert(feeds, timestamp)
         }
 
-        confirmVerified(cache)
+        confirmVerified(store)
     }
 
 
@@ -140,28 +141,29 @@ class CryptoFeedStoreUseCaseTest {
         val captureTimestamp = slot<Date>()
 
         every {
-            cache.deleteCache()
+            store.deleteCache()
         } returns flowOf(null)
 
         every {
-            cache.insert(capture(captureFeeds), capture(captureTimestamp))
-        } returns flowOf()
+            store.insert(capture(captureFeeds), capture(captureTimestamp))
+        } returns flowOf(null)
 
 
         sut.save(feeds).test {
+            assertNull(awaitItem())
             assertEquals(feeds, captureFeeds.captured)
             awaitComplete()
         }
 
         verify(exactly = 1) {
-            cache.deleteCache()
+            store.deleteCache()
         }
 
         verify(exactly = 1) {
-            cache.insert(feeds, timestamp)
+            store.insert(feeds, timestamp)
         }
 
-        confirmVerified(cache)
+        confirmVerified(store)
 
 
     }
