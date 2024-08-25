@@ -1,7 +1,7 @@
 package com.mutakindv.cryptofeed
 
 import app.cash.turbine.test
-import com.mutakindv.cryptofeed.cache.CryptoFeedCacheUseCase
+import com.mutakindv.cryptofeed.cache.CacheCryptoFeedUseCase
 import com.mutakindv.cryptofeed.cache.CryptoFeedStore
 import com.mutakindv.cryptofeed.domain.CoinInfo
 import com.mutakindv.cryptofeed.domain.CryptoFeed
@@ -25,7 +25,7 @@ import java.util.UUID
 class CryptoFeedStoreUseCaseTest {
 
     private val cache: CryptoFeedStore = spyk<CryptoFeedStore>()
-    private lateinit var sut: CryptoFeedCacheUseCase
+    private lateinit var sut: CacheCryptoFeedUseCase
 
 
     val feeds = listOf(
@@ -52,7 +52,7 @@ class CryptoFeedStoreUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        sut = CryptoFeedCacheUseCase(cache)
+        sut = CacheCryptoFeedUseCase(cache)
     }
 
 
