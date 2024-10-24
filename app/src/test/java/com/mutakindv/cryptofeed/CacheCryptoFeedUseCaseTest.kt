@@ -13,6 +13,7 @@ import io.mockk.every
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -24,7 +25,7 @@ import java.util.UUID
 
 
 
-class CryptoFeedStoreUseCaseTest {
+class CacheCryptoFeedUseCaseTest {
 
     private val store: CryptoFeedStore = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
@@ -51,7 +52,7 @@ class CryptoFeedStoreUseCaseTest {
         )
     )
 
-    val timestamp = Date()
+    private val timestamp = Date()
 
     @Before
     fun setUp() {
@@ -160,6 +161,11 @@ class CryptoFeedStoreUseCaseTest {
         }
 
         verify(exactly = 1) {
+            store.insert(feeds, timestamp)
+        }
+
+        verifyOrder {
+            store.deleteCache()
             store.insert(feeds, timestamp)
         }
 
