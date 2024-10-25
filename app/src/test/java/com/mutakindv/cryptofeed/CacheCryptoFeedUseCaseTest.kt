@@ -174,4 +174,31 @@ class CacheCryptoFeedUseCaseTest {
 
     }
 
+
+    @Test
+    fun testSaveSucceedsOnSuccessfulInsertion() = runTest {
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        every {
+            store.insert(feeds, timestamp)
+        } returns flowOf(null)
+
+        sut.save(feeds).test {
+            assertNull(awaitItem())
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
 }
