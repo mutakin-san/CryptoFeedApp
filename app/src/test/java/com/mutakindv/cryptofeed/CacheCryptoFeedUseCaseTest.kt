@@ -95,27 +95,6 @@ class CacheCryptoFeedUseCaseTest {
     @Test
     fun testSaveDoesNotRequestCacheInsertionOnDeletionError() = runTest {
 
-        val feeds = listOf(
-            CryptoFeed(
-                coinInfo = CoinInfo(UUID.randomUUID().toString(), "BTC", "Bitcoin", "imageUrl"),
-                raw = Raw(
-                    usd = Usd(
-                        price = 1.0,
-                        changePctDay = 1f
-                    )
-                )
-            ),
-            CryptoFeed(
-                coinInfo = CoinInfo(UUID.randomUUID().toString(), "BTC2", "Bitcoin 2", "imageUrl"),
-                raw = Raw(
-                    usd = Usd(
-                        price = 2.0,
-                        changePctDay = 2f
-                    )
-                )
-            )
-        )
-
         every {
             store.deleteCache()
         } returns flowOf(Exception())
