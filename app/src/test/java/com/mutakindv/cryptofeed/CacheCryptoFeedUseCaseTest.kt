@@ -161,12 +161,12 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert(feeds, timestamp)
+            store.insert(feeds, captureTimestamp.captured)
         }
 
         verifyOrder {
             store.deleteCache()
-            store.insert(feeds, timestamp)
+            store.insert(feeds, captureTimestamp.captured)
         }
 
         confirmVerified(store)
